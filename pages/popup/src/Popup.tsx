@@ -54,6 +54,10 @@ const Popup = () => {
       .executeScript({
         target: { tabId: tab.id! },
         func: () => {
+          // 修改 CSS 变量 --GBL01A 为黑色
+          document.documentElement.style.setProperty('--GBL01A', '#000000');
+          console.log('CSS 变量 --GBL01A 已修改为黑色');
+
           // 查找知乎 logo 的 SVG 元素
           const logoSvg = document.querySelector('#root > div > div.css-s8xum0 > header > div > a > svg');
 
