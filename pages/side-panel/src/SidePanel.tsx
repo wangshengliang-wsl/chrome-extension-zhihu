@@ -123,7 +123,7 @@ const SidePanel = () => {
                 </div>
                 <div
                   className={cn(
-                    'max-h-96 overflow-y-auto whitespace-pre-wrap break-words text-sm',
+                    'max-h-96 overflow-y-auto whitespace-pre-wrap break-words text-left text-sm',
                     isLight ? 'text-gray-700' : 'text-gray-300',
                   )}>
                   {answer.content}

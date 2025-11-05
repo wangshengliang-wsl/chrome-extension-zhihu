@@ -30,8 +30,8 @@ const manifest = {
   },
   version: packageJson.version,
   description: '__MSG_extensionDescription__',
-  host_permissions: ['<all_urls>'],
-  permissions: ['storage', 'scripting', 'tabs', 'notifications', 'sidePanel'],
+  host_permissions: ['https://www.zhihu.com/*'],
+  permissions: ['storage', 'scripting', 'tabs', 'notifications', 'sidePanel', 'activeTab'],
   options_page: 'options/index.html',
   background: {
     service_worker: 'background.js',
@@ -52,23 +52,15 @@ const manifest = {
   },
   content_scripts: [
     {
-      matches: ['http://*/*', 'https://*/*', '<all_urls>'],
+      matches: ['https://www.zhihu.com/question/*/answer/*'],
       js: ['content/all.iife.js'],
     },
     {
-      matches: ['https://example.com/*'],
-      js: ['content/example.iife.js'],
-    },
-    {
-      matches: ['http://*/*', 'https://*/*', '<all_urls>'],
+      matches: ['https://www.zhihu.com/question/*/answer/*'],
       js: ['content-ui/all.iife.js'],
     },
     {
-      matches: ['https://example.com/*'],
-      js: ['content-ui/example.iife.js'],
-    },
-    {
-      matches: ['http://*/*', 'https://*/*', '<all_urls>'],
+      matches: ['https://www.zhihu.com/question/*/answer/*'],
       css: ['content.css'],
     },
   ],
@@ -76,7 +68,7 @@ const manifest = {
   web_accessible_resources: [
     {
       resources: ['*.js', '*.css', '*.svg', 'icon-32.png', 'icon-128.png'],
-      matches: ['*://*/*'],
+      matches: ['https://www.zhihu.com/*'],
     },
   ],
   side_panel: {
