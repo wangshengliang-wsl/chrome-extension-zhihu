@@ -55,10 +55,10 @@ const manifest = {
       matches: ['https://www.zhihu.com/question/*/answer/*'],
       js: ['content/all.iife.js'],
     },
-    {
-      matches: ['https://www.zhihu.com/question/*/answer/*'],
-      js: ['content-ui/all.iife.js'],
-    },
+    // {
+    //   matches: ['https://www.zhihu.com/question/*/answer/*'],
+    //   js: ['content-ui/all.iife.js'],
+    // },
     {
       matches: ['https://www.zhihu.com/question/*/answer/*'],
       css: ['content.css'],
