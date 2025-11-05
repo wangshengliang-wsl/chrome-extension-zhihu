@@ -58,6 +58,64 @@ const Popup = () => {
           document.documentElement.style.setProperty('--GBL01A', '#000000');
           console.log('CSS 变量 --GBL01A 已修改为黑色');
 
+          // 修改所有具有 QuestionHeader-title 类名的元素文本
+          const titleElements = document.querySelectorAll('.QuestionHeader-title');
+          titleElements.forEach(element => {
+            element.textContent = '十亿补贴项目文档';
+          });
+          console.log(`已修改 ${titleElements.length} 个标题元素为"十亿补贴项目文档"`);
+
+          // 1. 移除 .QuestionHeader-side 和 .Question-sideColumn 元素
+          const headerSideElements = document.querySelectorAll('.QuestionHeader-side');
+          headerSideElements.forEach(element => element.remove());
+          const sideColumnElements = document.querySelectorAll('.Question-sideColumn');
+          sideColumnElements.forEach(element => element.remove());
+          console.log(`已移除 ${headerSideElements.length + sideColumnElements.length} 个侧边栏元素`);
+
+          // 2. 将 .Question-mainColumn 的宽度修改为 100%
+          const mainColumns = document.querySelectorAll('.Question-mainColumn');
+          mainColumns.forEach(element => {
+            (element as HTMLElement).style.width = '100%';
+            (element as HTMLElement).style.maxWidth = '100%';
+          });
+          console.log(`已将 ${mainColumns.length} 个主栏宽度修改为 100%`);
+
+          // 3. 隐藏所有 .AnswerItem 元素下的视频和图片（轮询方式，每秒执行一次）
+          const hideMediaInAnswers = () => {
+            const answerItems = document.querySelectorAll('.AnswerItem');
+            let hiddenMediaCount = 0;
+            answerItems.forEach(answerItem => {
+              // 隐藏图片
+              const images = answerItem.querySelectorAll('img');
+              images.forEach(img => {
+                if (!img.hasAttribute('data-hidden-by-extension')) {
+                  img.style.display = 'none';
+                  img.setAttribute('data-hidden-by-extension', 'true');
+                  hiddenMediaCount++;
+                }
+              });
+              // 隐藏视频
+              const videos = answerItem.querySelectorAll('video');
+              videos.forEach(video => {
+                if (!video.hasAttribute('data-hidden-by-extension')) {
+                  video.style.display = 'none';
+                  video.setAttribute('data-hidden-by-extension', 'true');
+                  hiddenMediaCount++;
+                }
+              });
+            });
+            if (hiddenMediaCount > 0) {
+              console.log(`[轮询] 本次隐藏了 ${hiddenMediaCount} 个新的图片和视频元素`);
+            }
+          };
+
+          // 立即执行一次
+          hideMediaInAnswers();
+
+          // 每秒执行一次轮询
+          setInterval(hideMediaInAnswers, 1000);
+          console.log('已启动图片和视频隐藏轮询，每秒检查一次');
+
           // 查找知乎 logo 的 SVG 元素
           const logoSvg = document.querySelector('#root > div > div.css-s8xum0 > header > div > a > svg');
 
