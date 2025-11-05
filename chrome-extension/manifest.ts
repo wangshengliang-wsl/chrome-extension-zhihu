@@ -43,9 +43,9 @@ const manifest = {
       '32': 'icon-32.png',
     },
   },
-  chrome_url_overrides: {
-    newtab: 'new-tab/index.html',
-  },
+  // chrome_url_overrides: {
+  //   newtab: 'new-tab/index.html',
+  // },
   icons: {
     '32': 'icon-32.png',
     '128': 'icon-128.png',
