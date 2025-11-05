@@ -1,8 +1,71 @@
 import '@src/Popup.css';
 import { withErrorBoundary, withSuspense } from '@extension/shared';
 import { ErrorDisplay, LoadingSpinner } from '@extension/ui';
+import { useState, useEffect } from 'react';
 
 const Popup = () => {
+  const [isSidePanelOpen, setIsSidePanelOpen] = useState(false);
+
+  // 检查侧边栏当前状态
+  useEffect(() => {
+    const checkSidePanelStatus = async () => {
+      try {
+        const [tab] = await chrome.tabs.query({ currentWindow: true, active: true });
+        if (tab.id) {
+          // 尝试获取当前侧边栏状态
+          // 注意：Chrome 的 sidePanel API 可能没有直接查询状态的方法
+          // 这里我们使用本地存储来跟踪状态
+          const result = await chrome.storage.local.get(['sidePanelOpen']);
+          setIsSidePanelOpen(result.sidePanelOpen || false);
+        }
+      } catch (error) {
+        console.error('检查侧边栏状态失败:', error);
+      }
+    };
+    checkSidePanelStatus();
+  }, []);
+
+  const toggleSidePanel = async () => {
+    try {
+      const [tab] = await chrome.tabs.query({ currentWindow: true, active: true });
+
+      if (!tab.id) {
+        return;
+      }
+
+      if (!isSidePanelOpen) {
+        // 打开侧边栏
+        await chrome.sidePanel.open({ windowId: tab.windowId });
+        setIsSidePanelOpen(true);
+        await chrome.storage.local.set({ sidePanelOpen: true });
+      } else {
+        // Chrome 目前没有直接关闭侧边栏的 API
+        // 作为替代方案，我们可以提示用户手动关闭，或者什么都不做
+        // 这里我们切换状态并保存
+        setIsSidePanelOpen(false);
+        await chrome.storage.local.set({ sidePanelOpen: false });
+
+        // 发送消息到 background 或 content script 来处理关闭逻辑
+        chrome.runtime.sendMessage({ action: 'closeSidePanel' }).catch(err => {
+          console.log('发送关闭侧边栏消息失败:', err);
+        });
+      }
+    } catch (error) {
+      console.error('切换侧边栏失败:', error);
+      // 如果失败，尝试只打开侧边栏
+      try {
+        const [tab] = await chrome.tabs.query({ currentWindow: true, active: true });
+        if (tab.windowId) {
+          await chrome.sidePanel.open({ windowId: tab.windowId });
+          setIsSidePanelOpen(true);
+          await chrome.storage.local.set({ sidePanelOpen: true });
+        }
+      } catch (err) {
+        console.error('打开侧边栏失败:', err);
+      }
+    }
+  };
+
   const changeZhihuStyle = async () => {
     const [tab] = await chrome.tabs.query({ currentWindow: true, active: true });
 
@@ -171,11 +234,18 @@ const Popup = () => {
     <div className="App">
       <header className="App-header">
         <img src={chrome.runtime.getURL('icon-128.png')} className="App-logo" alt="logo" />
-        <button
-          className="mt-4 rounded bg-blue-500 px-6 py-2 font-bold text-white shadow transition-all hover:scale-105 hover:bg-blue-600"
-          onClick={changeZhihuStyle}>
-          修改知乎样式
-        </button>
+        <div className="flex gap-4">
+          <button
+            className="mt-4 rounded bg-blue-500 px-6 py-2 font-bold text-white shadow transition-all hover:scale-105 hover:bg-blue-600"
+            onClick={changeZhihuStyle}>
+            修改知乎样式
+          </button>
+          <button
+            className="mt-4 rounded bg-green-500 px-6 py-2 font-bold text-white shadow transition-all hover:scale-105 hover:bg-green-600"
+            onClick={toggleSidePanel}>
+            {isSidePanelOpen ? '收起侧边栏' : '展开侧边栏'}
+          </button>
+        </div>
       </header>
     </div>
   );
