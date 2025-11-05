@@ -6,7 +6,7 @@ import { cn, ErrorDisplay, LoadingSpinner, ToggleButton } from '@extension/ui';
 
 const notificationOptions = {
   type: 'basic',
-  iconUrl: chrome.runtime.getURL('icon-34.png'),
+  iconUrl: chrome.runtime.getURL('icon-32.png'),
   title: 'Injecting content script error',
   message: 'You cannot inject script here!',
 } as const;
@@ -43,7 +43,7 @@ const Popup = () => {
     if (tab.url!.startsWith('about:') || tab.url!.startsWith('chrome:')) {
       chrome.notifications.create('inject-error', {
         type: 'basic',
-        iconUrl: chrome.runtime.getURL('icon-34.png'),
+        iconUrl: chrome.runtime.getURL('icon-32.png'),
         title: '无法修改样式',
         message: '此页面不支持样式修改！',
       });
@@ -193,7 +193,7 @@ const Popup = () => {
         if (err.message.includes('Cannot access a chrome:// URL')) {
           chrome.notifications.create('inject-error', {
             type: 'basic',
-            iconUrl: chrome.runtime.getURL('icon-34.png'),
+            iconUrl: chrome.runtime.getURL('icon-32.png'),
             title: '无法修改样式',
             message: '此页面不支持样式修改！',
           });

@@ -1,8 +1,7 @@
 import '@src/SidePanel.css';
-import { t } from '@extension/i18n';
-import { PROJECT_URL_OBJECT, useStorage, withErrorBoundary, withSuspense } from '@extension/shared';
+import { useStorage, withErrorBoundary, withSuspense } from '@extension/shared';
 import { exampleThemeStorage } from '@extension/storage';
-import { cn, ErrorDisplay, LoadingSpinner, ToggleButton } from '@extension/ui';
+import { cn, ErrorDisplay, LoadingSpinner } from '@extension/ui';
 import { useEffect, useState } from 'react';
 
 interface Answer {
@@ -12,11 +11,8 @@ interface Answer {
 
 const SidePanel = () => {
   const { isLight } = useStorage(exampleThemeStorage);
-  const logo = isLight ? 'side-panel/logo_vertical.svg' : 'side-panel/logo_vertical_dark.svg';
   const [answers, setAnswers] = useState<Answer[]>([]);
   const [isAnimating, setIsAnimating] = useState(false);
-
-  const goGithubSite = () => chrome.tabs.create(PROJECT_URL_OBJECT);
 
   useEffect(() => {
     // 监听来自 content script 的消息
@@ -53,9 +49,7 @@ const SidePanel = () => {
   };
 
   const copyAllToClipboard = async () => {
-    const fullText = answers
-      .map(answer => `======== 答案 ${answer.index} ========\n${answer.content}`)
-      .join('\n\n');
+    const fullText = answers.map(answer => `======== 答案 ${answer.index} ========\n${answer.content}`).join('\n\n');
 
     try {
       await navigator.clipboard.writeText(fullText);
@@ -67,24 +61,17 @@ const SidePanel = () => {
 
   return (
     <div className={cn('App min-h-screen', isLight ? 'bg-slate-50' : 'bg-gray-800')}>
-      <header className={cn('p-4 border-b', isLight ? 'bg-white border-gray-200' : 'bg-gray-900 border-gray-700')}>
-        <div className="flex items-center justify-between mb-4">
-          <button onClick={goGithubSite}>
-            <img src={chrome.runtime.getURL(logo)} className="h-8" alt="logo" />
-          </button>
-          <ToggleButton onClick={exampleThemeStorage.toggle}>{t('toggleTheme')}</ToggleButton>
-        </div>
-        <h1 className={cn('text-xl font-bold', isLight ? 'text-gray-900' : 'text-gray-100')}>知乎答案收集器</h1>
+      <header className={cn('border-b p-4', isLight ? 'border-gray-200 bg-white' : 'border-gray-700 bg-gray-900')}>
         {answers.length > 0 && (
-          <div className="flex gap-2 mt-4">
+          <div className="flex justify-center gap-2">
             <button
               onClick={copyAllToClipboard}
-              className="px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors">
+              className="rounded bg-blue-500 px-3 py-1 text-sm text-white transition-colors hover:bg-blue-600">
               复制全部
             </button>
             <button
               onClick={clearAnswers}
-              className="px-3 py-1 text-sm bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors">
+              className="rounded bg-gray-500 px-3 py-1 text-sm text-white transition-colors hover:bg-gray-600">
               清空
             </button>
           </div>
@@ -93,8 +80,8 @@ const SidePanel = () => {
 
       <main className="p-4">
         {answers.length === 0 ? (
-          <div className={cn('text-center py-12', isLight ? 'text-gray-500' : 'text-gray-400')}>
-            <p className="text-lg mb-2">暂无答案</p>
+          <div className={cn('py-12 text-center', isLight ? 'text-gray-500' : 'text-gray-400')}>
+            <p className="mb-2 text-lg">暂无答案</p>
             <p className="text-sm">点击页面中的"复制答案"按钮开始收集</p>
           </div>
         ) : (
@@ -103,14 +90,16 @@ const SidePanel = () => {
               <div
                 key={`${answer.index}-${idx}`}
                 className={cn(
-                  'p-4 rounded-lg border transition-all duration-300 transform',
-                  isLight ? 'bg-white border-gray-200' : 'bg-gray-900 border-gray-700',
-                  isAnimating && idx === answers.length - 1 ? 'animate-fadeIn scale-95 opacity-0' : 'scale-100 opacity-100',
+                  'transform rounded-lg border p-4 transition-all duration-300',
+                  isLight ? 'border-gray-200 bg-white' : 'border-gray-700 bg-gray-900',
+                  isAnimating && idx === answers.length - 1
+                    ? 'animate-fadeIn scale-95 opacity-0'
+                    : 'scale-100 opacity-100',
                 )}
                 style={{
                   animation: isAnimating && idx === answers.length - 1 ? 'fadeInScale 0.3s ease-out forwards' : 'none',
                 }}>
-                <div className="flex items-center justify-between mb-2">
+                <div className="mb-2 flex items-center justify-between">
                   <span className={cn('text-sm font-semibold', isLight ? 'text-blue-600' : 'text-blue-400')}>
                     答案 {answer.index}
                   </span>
@@ -124,7 +113,7 @@ const SidePanel = () => {
                       }
                     }}
                     className={cn(
-                      'px-2 py-1 text-xs rounded transition-colors',
+                      'rounded px-2 py-1 text-xs transition-colors',
                       isLight
                         ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                         : 'bg-gray-800 text-gray-300 hover:bg-gray-700',
@@ -134,7 +123,7 @@ const SidePanel = () => {
                 </div>
                 <div
                   className={cn(
-                    'text-sm whitespace-pre-wrap break-words max-h-96 overflow-y-auto',
+                    'max-h-96 overflow-y-auto whitespace-pre-wrap break-words text-sm',
                     isLight ? 'text-gray-700' : 'text-gray-300',
                   )}>
                   {answer.content}

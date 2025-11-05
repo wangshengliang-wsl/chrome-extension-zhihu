@@ -50,10 +50,12 @@ const createCopyButton = () => {
   // 点击事件：复制所有答案内容
   button.addEventListener('click', async () => {
     try {
-      // 获取所有 .AnswerItem 元素
-      const answerItems = document.querySelectorAll('.AnswerItem');
+      // 查找指定的富文本元素
+      const richTextElements = document.querySelectorAll(
+        '#content > span.RichText.ztext.CopyrightRichText-richText.css-p0g0qc',
+      );
 
-      if (answerItems.length === 0) {
+      if (richTextElements.length === 0) {
         button.textContent = '未找到答案';
         setTimeout(() => {
           button.textContent = '复制答案';
@@ -65,8 +67,9 @@ const createCopyButton = () => {
       const answers: Array<{ index: number; content: string }> = [];
       const answerTexts: string[] = [];
 
-      answerItems.forEach((item, index) => {
-        const textContent = item.textContent?.trim();
+      richTextElements.forEach((element, index) => {
+        const textContent = element.textContent?.trim();
+
         if (textContent) {
           answers.push({
             index: index + 1,
@@ -76,19 +79,29 @@ const createCopyButton = () => {
         }
       });
 
+      if (answers.length === 0) {
+        button.textContent = '未找到内容';
+        setTimeout(() => {
+          button.textContent = '复制答案';
+        }, 2000);
+        return;
+      }
+
       const fullText = answerTexts.join('\n');
 
       // 复制到剪贴板
       await navigator.clipboard.writeText(fullText);
 
       // 发送消息到侧边栏，显示答案
-      chrome.runtime.sendMessage({
-        type: 'COPY_ANSWERS',
-        answers: answers,
-      });
+      if (chrome?.runtime?.sendMessage) {
+        chrome.runtime.sendMessage({
+          type: 'COPY_ANSWERS',
+          answers: answers,
+        });
+      }
 
       // 显示成功提示
-      button.textContent = `✓ 已复制 ${answerItems.length} 个答案`;
+      button.textContent = `✓ 已复制 ${answers.length} 个答案`;
       button.style.backgroundColor = '#52c41a';
 
       setTimeout(() => {
@@ -96,7 +109,7 @@ const createCopyButton = () => {
         button.style.backgroundColor = '#1677ff';
       }, 2000);
 
-      console.log(`成功复制 ${answerItems.length} 个答案到剪贴板，并发送到侧边栏`);
+      console.log(`成功复制 ${answers.length} 个答案到剪贴板，并发送到侧边栏`);
     } catch (error) {
       console.error('复制失败:', error);
       button.textContent = '✗ 复制失败';
